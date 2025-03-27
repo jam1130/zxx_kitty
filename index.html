@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>张笑笑的Hello Kitty天气</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fff0f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        
+        .weather-card {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .love-message-container {
+            background-color: rgba(255, 248, 248, 0.8);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            font-style: italic;
+        }
+        
+        .button {
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(255, 105, 180, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .button:hover {
+            background-color: #ff1493;
+            transform: scale(1.05);
+        }
+        
+        .button::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: all 0.5s;
+        }
+        
+        .button:hover::after {
+            left: 100%;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: #fff0f5;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .close {
+            color: #ff69b4;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #ff1493;
+        }
+        
+        input, button {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 10px;
+            border: 1px solid #ffb6c1;
+        }
+        
+        .city-list {
+            list-style: none;
+            padding: 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .city-list li {
+            padding: 10px;
+            border-bottom: 1px solid #ffb6c1;
+            cursor: pointer;
+        }
+        
+        .city-list li:hover {
+            background-color: #ffb6c1;
+        }
+        
+        .city-list li.selected {
+            background-color: #ff69b4;
+            color: white;
+        }
+        
+        #kittyContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        /* 添加可爱的标题样式 */
+        h1 {
+            color: #ff1493;
+            text-shadow: 2px 2px 4px rgba(255, 182, 193, 0.5);
+            letter-spacing: 1px;
+        }
+        
+        /* 添加可爱的边框 */
+        .weather-card, .love-message-container {
+            border-radius: 25px;
+            border: 3px solid #ffb6c1;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 添加彩虹渐变边框效果 */
+        .weather-card::before, .love-message-container::before {
+            content: "";
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            z-index: -1;
+            background: linear-gradient(45deg, #ff69b4, #ffb6c1, #ffc0cb, #ff69b4);
+            background-size: 400% 400%;
+            animation: gradientBorder 15s ease infinite;
+            border-radius: 28px;
+        }
+        
+        @keyframes gradientBorder {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* 添加页面过渡效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 添加可爱的输入框样式 */
+        input {
+            border: 2px solid #ffb6c1;
+            background-color: rgba(255, 240, 245, 0.8);
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            border-color: #ff69b4;
+            box-shadow: 0 0 8px rgba(255, 105, 180, 0.5);
+            outline: none;
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body>
+    <div id="videoBackground" class="video-background">
+        <video id="bgVideo" autoplay muted loop></video>
+    </div>
+    
+    <div id="kittyContainer"></div>
+    
+    <div class="container">
+        <div class="weather-card">
+            <h1>张笑笑的Hello Kitty天气</h1>
+            <h2 id="cityName">加载中...</h2>
+            <p id="date">--</p>
+            <p>天气: <span id="weather">--</span> <span class="weather-icon">🌈</span></p>
+            <p>温度: <span id="temperature">--</span> <span class="temp-icon">🌡️</span></p>
+            
+            <button id="refreshBtn" class="button">✨ 刷新天气 ✨</button>
+            <button id="settingsBtn" class="button">⚙️ 设置 ⚙️</button>
+        </div>
+        
+        <div class="love-message-container">
+            <p>💌 今日情话 💌</p>
+            <p id="loveMessage">--</p>
+        </div>
+    </div>
+    
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>设置</h2>
+            
+            <div>
+                <label for="apiKey">和风天气API Key:</label>
+                <input type="text" id="apiKey" placeholder="输入API Key">
+            </div>
+            
+            <div>
+                <label for="citySearch">搜索城市:</label>
+                <div style="display: flex;">
+                    <input type="text" id="citySearch" placeholder="输入城市名称">
+                    <button id="searchBtn" class="button">搜索</button>
+                </div>
+                
+                <ul id="cityList" class="city-list"></ul>
+            </div>
+            
+            <button id="saveSettingsBtn" class="button">保存设置</button>
+        </div>
+    </div>
+    
+    <!-- 添加背景音乐播放器 -->
+    <div style="position: fixed; bottom: 20px; right: 20px; z-index: 100;">
+        <button id="musicToggleBtn" class="button" style="border-radius: 50%; width: 50px; height: 50px; padding: 0;">
+            🎵
+        </button>
+        <audio id="bgMusic" loop>
+            <source src="static/music/cute_bgm.mp3" type="audio/mp3">
+        </audio>
+    </div>
+    
+    <script src="script.js"></script>
+    
+    <!-- 添加音乐播放器的脚本 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const musicBtn = document.getElementById('musicToggleBtn');
+            const bgMusic = document.getElementById('bgMusic');
+            
+            let isMusicPlaying = false;
+            
+            musicBtn.addEventListener('click', function() {
+                if (isMusicPlaying) {
+                    bgMusic.pause();
+                    musicBtn.textContent = '🎵';
+                } else {
+                    bgMusic.play();
+                    musicBtn.textContent = '🔇';
+                }
+                isMusicPlaying = !isMusicPlaying;
+            });
+        });
+    </script>
+</body>
+</html> 
